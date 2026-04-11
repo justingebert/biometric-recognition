@@ -1,0 +1,21 @@
+name: biometrics
+channels:
+  - apple
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.11
+  - numpy
+  - matplotlib
+  - opencv
+  - jupyter
+  - ipykernel
+  - pip
+  - pip:
+    # ---------- Platform-specific TensorFlow ----------
+    # On macOS Apple Silicon:
+    - tensorflow-macos; sys_platform == 'darwin'
+    - tensorflow-metal; sys_platform == 'darwin'
+    # On Windows/Linux (NVIDIA GPU):
+    - tensorflow[and-cuda]; sys_platform != 'darwin'

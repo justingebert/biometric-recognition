@@ -9,10 +9,13 @@ dependencies:
   - numpy
   - matplotlib
   - opencv
+  - sqlite
   - jupyter
   - ipykernel
   - pip
   - pip:
+    - kagglehub
+    - "protobuf>=4.23,<5"
     # ---------- Platform-specific TensorFlow ----------
     # On macOS Apple Silicon:
     - tensorflow-macos; sys_platform == 'darwin'

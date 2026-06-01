@@ -178,3 +178,9 @@ cython_debug/
 
 data/
 application_data/
+
+*.keras
+
+notebooks/training_checkpoints
+
+*.pdf

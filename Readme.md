@@ -18,3 +18,4 @@ conda env update -f environment.yml --prune
 
 ### Problems:
 - getting tensorflow GPU to work on apple silicon -> some reserach and AI help solved it -> tf-metal plugin + tensorflow-macos on 3.11
+- tutorial uses old tensorflow functionalties -> need to port to new ones

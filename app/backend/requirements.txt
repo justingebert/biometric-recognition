@@ -1,0 +1,4 @@
+fastapi
+uvicorn[standard]
+python-multipart
+# tensorflow / numpy already provided by the `biometrics` conda env

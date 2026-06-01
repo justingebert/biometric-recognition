@@ -1,0 +1,62 @@
+.app {
+  max-width: 480px;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  font-family: system-ui, sans-serif;
+}
+
+.cam {
+  width: 100%;
+  border-radius: 8px;
+  background: #000;
+  transform: scaleX(-1); /* mirror, feels natural */
+}
+
+button {
+  padding: 0.6rem 1.4rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.error {
+  color: #dc2626;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+}
+
+.result small {
+  font-size: 0.85rem;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.result.ok {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.result.no {
+  background: #fee2e2;
+  color: #991b1b;
+}

@@ -180,7 +180,11 @@ data/
 application_data/
 
 *.keras
+# shipped model lives here — tracked via Git LFS (see .gitattributes):
+!models/*.keras
 
 notebooks/training_checkpoints
 
 *.pdf
+
+.DS_Store

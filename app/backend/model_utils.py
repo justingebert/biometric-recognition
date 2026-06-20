@@ -1,3 +1,4 @@
+import glob
 import os
 
 import numpy as np
@@ -5,7 +6,20 @@ import tensorflow as tf
 from tensorflow.keras.layers import Layer
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-MODEL_PATH = os.path.join(ROOT, "data", "siamesemodel.keras")
+MODELS_DIR = os.path.join(ROOT, "models")
+
+
+def _latest_model(models_dir):
+    """Newest models/siamesemodel_<timestamp>.keras (lexical sort = chronological)."""
+    paths = sorted(glob.glob(os.path.join(models_dir, "siamesemodel_*.keras")))
+    if not paths:
+        raise FileNotFoundError(
+            f"No siamesemodel_*.keras in {models_dir}. Train the model or run `git lfs pull`."
+        )
+    return paths[-1]
+
+
+MODEL_PATH = _latest_model(MODELS_DIR)
 VERIFICATION_IMG_DIR = os.path.join(ROOT, "application_data", "verification_images")
 
 DETECTION_THRESHOLD = 0.5

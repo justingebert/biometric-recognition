@@ -1,0 +1,17 @@
+tensorflow==2.16.2          # bundles Keras 3.14; the .keras model is Keras-3 native
+keras==3.14.0               # pinned to lock the save/load format
+
+# --- Numerics / plotting / vision ---
+numpy==1.26.4               # must stay <2.0 for TensorFlow 2.16
+matplotlib==3.10.8
+opencv-python==4.10.0.84    # GUI build (webcam: VideoCapture/imshow). Last 4.x
+                            # that accepts numpy<2 — 4.11+ wheels force numpy>=2,
+                            # which collides with TensorFlow's numpy<2 pin.
+kagglehub==1.0.0
+
+jupyterlab==4.5.6
+notebook==7.5.5
+ipykernel==7.2.0
+
+# --- OPT-IN GPU (Apple Silicon only). Uncomment to enable the USE_GPU path. ---
+# tensorflow-metal==1.2.0

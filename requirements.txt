@@ -3,6 +3,7 @@ keras==3.14.0               # pinned to lock the save/load format
 
 # --- Numerics / plotting / vision ---
 numpy==1.26.4               # must stay <2.0 for TensorFlow 2.16
+scikit-learn==1.9.0         # eval metrics (accuracy/precision/recall/F1/ROC-AUC); keeps numpy 1.26 pin
 matplotlib==3.10.8
 opencv-python==4.10.0.84    # GUI build (webcam: VideoCapture/imshow). Last 4.x
                             # that accepts numpy<2 — 4.11+ wheels force numpy>=2,

@@ -17,14 +17,16 @@ This project is split into two parts:
 Create a local virtual environment and install the notebook dependencies:
 
 ```bash
-pyenv install 3.11.15
-python3.11 -m venv .venv
+pyenv install -s 3.11.15                                    # -s: skip if already installed (no prompt)
+"$(pyenv root)/versions/3.11.15/bin/python" -m venv .venv   # build the venv from the pinned Python
 source .venv/bin/activate
+python -V                                                   # sanity check: expect Python 3.11.15
 python -m pip install --upgrade pip
 python -m pip install -r requirements.lock.txt
 ```
 
-If Python 3.11 is already installed, you can skip `pyenv install 3.11.15`.
+Not using pyenv? Any Python 3.11 works: replace the `pyenv` lines with your own
+`python3.11 -m venv .venv` (only valid when a real `python3.11` is on PATH).
 
 Register the virtual environment as a Jupyter kernel:
 
@@ -62,22 +64,19 @@ Inside an IDE (kernel launched by the editor, not the shell), set `USE_GPU=1` th
 - backend: FastAPI
 - frontend: React + Vite
 - start:
-
 ```bash
 ./app/start.sh
 ```
 
-
-### Problems
+## Problems / Troubleshooting
 
 - Apple Silicon GPU support can be fragile. The stable path is TensorFlow 2.16 on Python 3.11 with CPU by default, and `tensorflow-metal` only when explicitly enabled.
 - The original tutorial uses older TensorFlow functionality, so parts of the notebook have been ported to current TensorFlow/Keras behavior.
 
+## Background & Interpretation
+- TODO
+
 ## References
-
-General biometrics terminology and system background are based on:
-
-- Anil K. Jain, Arun A. Ross, and Karthik Nandakumar. "Introduction to Biometrics." Springer, 2011. https://doi.org/10.1007/978-0-387-77326-1
 
 The Siamese face-verification model and implementation are based on Nicholas Renotte's tutorial and companion code:
 
@@ -95,3 +94,7 @@ The LFW face images used for impostor examples are downloaded through KaggleHub 
 The original dataset is Labeled Faces in the Wild (LFW), originally hosted by UMass at http://vis-www.cs.umass.edu/lfw/ (the original page may no longer be available). Dataset citation:
 
 - Gary B. Huang, Manu Ramesh, Tamara Berg, and Erik Learned-Miller. "Labeled Faces in the Wild: A Database for Studying Face Recognition in Unconstrained Environments." Technical Report 07-49, University of Massachusetts, Amherst, 2007.
+
+General biometrics terminology and system background are based on:
+
+- Anil K. Jain, Arun A. Ross, and Karthik Nandakumar. "Introduction to Biometrics." Springer, 2011. https://doi.org/10.1007/978-0-387-77326-1

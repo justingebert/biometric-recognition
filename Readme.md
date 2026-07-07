@@ -1,10 +1,16 @@
 # Biometrics
-Intro to biometrics (facial recongintion) using Python.
+Intro to biometrics (facial recongintion) using Python. Based on the tutorial series by Nicholas Renotte.
+
+This project is split into two parts:
+- a notebook for training and evaluating the model,
+- a verification app to test the model with live inference.
 
 ## Prerequisites
 
 - macOS with Python 3.11 available.
-- Optional: `pyenv`, if you want to use the exact project Python from `.python-version`.
+- Optional:
+  - (for maximum compatibility): `pyenv`, if you want to use the exact project Python from `.python-version`.
+  - Docker for running the verification app.
 
 ## Notebook setup with venv
 
@@ -37,7 +43,7 @@ In Jupyter or VS Code, select the `Python (biometrics)` kernel before running th
 
 ## Apple Silicon GPU
 
-The default notebook setup runs on CPU, which is the safest path for grading and reproducibility.
+The default notebook setup runs on CPU, which is the safest path for reproducibility.
 
 To opt in to Apple Metal GPU support:
 
@@ -51,7 +57,7 @@ If TensorFlow crashes or behaves unexpectedly, restart Jupyter without `USE_GPU=
 
 Inside an IDE (kernel launched by the editor, not the shell), set `USE_GPU=1` then restart the kernel: in **PyCharm** via Settings → Languages & Frameworks → Jupyter → managed server → Environment variables; in **VS Code** add `USE_GPU=1` to a `.env` file in the project root.
 
-## Minimal verification app to test models
+## Verification app to test models with live inference
 
 - backend: FastAPI
 - frontend: React + Vite
@@ -68,6 +74,10 @@ Inside an IDE (kernel launched by the editor, not the shell), set `USE_GPU=1` th
 - The original tutorial uses older TensorFlow functionality, so parts of the notebook have been ported to current TensorFlow/Keras behavior.
 
 ## References
+
+General biometrics terminology and system background are based on:
+
+- Anil K. Jain, Arun A. Ross, and Karthik Nandakumar. "Introduction to Biometrics." Springer, 2011. https://doi.org/10.1007/978-0-387-77326-1
 
 The Siamese face-verification model and implementation are based on Nicholas Renotte's tutorial and companion code:
 

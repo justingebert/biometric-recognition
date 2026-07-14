@@ -176,8 +176,14 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
-data/
-application_data/
+# training data is ignored by default, but ship the demo galleries + staged
+# probes the app needs: data/<person>/verification/ and data/manual_test/
+data/**
+!data/*/
+!data/*/verification/
+!data/*/verification/**
+!data/manual_test/
+!data/manual_test/**
 
 *.keras
 # shipped model lives here — tracked via Git LFS (see .gitattributes):

@@ -2,10 +2,16 @@
 set -e
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(cd "$DIR/.." && pwd)"
+PYTHON="$ROOT/.venv/bin/python"
+
+if [[ ! -x "$PYTHON" ]]; then
+  echo "Missing $PYTHON. Follow the README setup first." >&2
+  exit 1
+fi
 
 echo "Starting backend on http://localhost:8000 ..."
-(cd "$DIR/backend" && conda run --no-capture-output -n biometrics \
-  uvicorn main:app --reload --port 8000) &
+(cd "$DIR/backend" && "$PYTHON" -m uvicorn main:app --reload --port 8000) &
 BACKEND_PID=$!
 
 echo "Starting frontend on http://localhost:5173 ..."

@@ -160,16 +160,17 @@ data/manual_test/*.jpg             staged probe images, shown as clickable thumb
 - Demo galleries and probes for a few people are committed so the app runs out of the box; the rest of `data/` (anchor, positive, LFW) stays git-ignored. Run `git lfs pull` for the model.
 - `GALLERY_LIMIT` in `app/backend/model_utils.py` caps how many gallery images each verify uses (first N by filename, deterministic); lower it to speed up verification.
 
-### Prerequisites
-- Node.js 18.16.0+
-- npm 8.11.0+
-- a webcam (optional; upload and test probes work without one)
-
+### With Node.js installed
 ```bash
 source .venv/bin/activate
 python -m pip install -r app/backend/requirements.txt
 cd app/frontend && npm ci && cd ../..
 ./app/start.sh
+```
+
+### With Docker
+```bash
+docker compose up --build
 ```
 
 Open <http://localhost:5173>. Select the claimed identity, then capture, upload, or click a test probe. Two sliders adjust the decision live: the **match threshold** (per-image score cutoff for counting one comparison a match) and the **decision threshold** (fraction of gallery matches required to accept); both default to 0.50. A rejection for an unenrolled person, or for the wrong claimed identity, is correct verification behavior.

@@ -1,0 +1,8 @@
+.git
+.venv
+app/frontend/node_modules
+app/frontend/dist
+data
+models
+notebooks
+research

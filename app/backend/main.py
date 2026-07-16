@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from model_utils import (
-    MANUAL_TEST_DIR,
+    TEST_PROBES_DIR,
     list_persons,
     list_test_images,
     run_verify,
@@ -23,8 +23,8 @@ app.add_middleware(
 )
 
 # Serve staged probe images so the frontend can render thumbnails.
-os.makedirs(MANUAL_TEST_DIR, exist_ok=True)
-app.mount("/test-images-static", StaticFiles(directory=MANUAL_TEST_DIR), name="test-images-static")
+os.makedirs(TEST_PROBES_DIR, exist_ok=True)
+app.mount("/test-images-static", StaticFiles(directory=TEST_PROBES_DIR), name="test-images-static")
 
 
 @app.get("/persons")

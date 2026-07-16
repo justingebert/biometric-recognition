@@ -1,5 +1,6 @@
 import glob
 import os
+from time import perf_counter
 
 import numpy as np
 import tensorflow as tf
@@ -8,7 +9,7 @@ from tensorflow.keras.layers import Layer
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 MODELS_DIR = os.path.join(ROOT, "models")
 DATA_DIR = os.path.join(ROOT, "data")
-MANUAL_TEST_DIR = os.path.join(DATA_DIR, "manual_test")
+TEST_PROBES_DIR = os.path.join(DATA_DIR, "test_probes")
 
 # Max gallery images used per verify (first N by sorted filename -> deterministic).
 # Set to None to use every image in the person's verification/ folder.
@@ -70,8 +71,8 @@ def list_persons() -> list[str]:
 
 
 def list_test_images() -> list[str]:
-    """Filenames of the staged probe images in data/manual_test/."""
-    return _jpgs(MANUAL_TEST_DIR)
+    """Filenames of the staged probe images in data/test_probes/."""
+    return _jpgs(TEST_PROBES_DIR)
 
 
 def preprocess_bytes(image_bytes: bytes) -> tf.Tensor:
@@ -118,10 +119,13 @@ def run_verify(
     input_img = tf.expand_dims(preprocess_bytes(input_bytes), axis=0)
 
     results = []
+    inference_s = 0.0  # summed model.predict time only (excludes gallery preprocessing)
     for name in files:
         val_img = preprocess_file(os.path.join(gallery_dir, name))
         val_img = tf.expand_dims(val_img, axis=0)
+        t0 = perf_counter()
         score = model.predict([input_img, val_img], verbose=0)
+        inference_s += perf_counter() - t0
         results.append(float(score[0][0]))
 
     results = np.array(results)
@@ -137,6 +141,8 @@ def run_verify(
         "total": len(files),
         "detection_threshold": det_thr,
         "verification_threshold": ver_thr,
+        "inference_ms": round(inference_s * 1000, 1),
+        "inference_ms_per_comparison": round(inference_s * 1000 / len(files), 2),
     }
 
 
@@ -146,10 +152,10 @@ def run_verify_test(
     detection_threshold: float | None = None,
     verification_threshold: float | None = None,
 ) -> dict:
-    """Verify a staged probe from data/manual_test/ against `person`'s gallery."""
+    """Verify a staged probe from data/test_probes/ against `person`'s gallery."""
     if name not in list_test_images():
         raise ValueError(f"Unknown test image '{name}'.")
-    path = os.path.join(MANUAL_TEST_DIR, name)
+    path = os.path.join(TEST_PROBES_DIR, name)
     return run_verify(
         person,
         tf.io.read_file(path).numpy(),

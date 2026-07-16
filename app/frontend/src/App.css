@@ -184,6 +184,12 @@ button.ghost {
   opacity: 0.8;
 }
 
+.result small.timing {
+  font-size: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  opacity: 0.65;
+}
+
 .result.ok {
   background: #dcfce7;
   color: #166534;

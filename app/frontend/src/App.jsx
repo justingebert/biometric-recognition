@@ -78,9 +78,11 @@ export default function App() {
       form.append("file", blob, "input.jpg");
       form.append("detection_threshold", detThr);
       form.append("verification_threshold", verThr);
+      const t0 = performance.now();
       const res = await fetch(`${API}/verify`, { method: "POST", body: form });
+      const roundtrip_ms = performance.now() - t0;
       if (!res.ok) throw new Error();
-      setResult(await res.json());
+      setResult({ ...(await res.json()), roundtrip_ms });
     } catch {
       setError("Verification request failed. Is the backend running?");
     } finally {
@@ -117,6 +119,7 @@ export default function App() {
     setLoading(true);
     reset();
     try {
+      const t0 = performance.now();
       const res = await fetch(`${API}/verify-test`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -127,8 +130,9 @@ export default function App() {
           verification_threshold: verThr,
         }),
       });
+      const roundtrip_ms = performance.now() - t0;
       if (!res.ok) throw new Error();
-      setResult(await res.json());
+      setResult({ ...(await res.json()), roundtrip_ms });
     } catch {
       setError("Verification request failed. Is the backend running?");
     } finally {
@@ -272,6 +276,12 @@ export default function App() {
           <small>
             as {result.person} · {result.detections}/{result.total} matches ·{" "}
             {Math.round(result.confidence * 100)}%
+          </small>
+          <small className="timing">
+            inference {result.inference_ms} ms ({result.inference_ms_per_comparison} ms/img
+            × {result.total})
+            {result.roundtrip_ms != null &&
+              ` · round-trip ${Math.round(result.roundtrip_ms)} ms`}
           </small>
         </div>
       )}

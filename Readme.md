@@ -33,7 +33,19 @@ flowchart LR
 
 This design follows the supervised metric-learning idea described by Koch, Zemel, and Salakhutdinov [1].
 
-## What changed from the tutorial
+### Data
+
+Local webcam recordings (400×400 center crop, resized to 100×100 for the model):
+
+| Person | Anchor | Positive | Verification (held out) | Capture sessions |
+|---|---:|---:|---:|---:|
+| justin | 391 | 505 | 90 | 7 |
+| lara | 383 | 443 | 115 | 1 |
+| tomas | 379 | 359 | 113 | 1 |
+
+Impostor source: **LFW (funneled)**, 13,233 images of 5,749 identities, split by identity into 70% train / 15% pair-test / 15% operational-evaluation partitions so no LFW identity appears in more than one role. Training uses 1,000 genuine pairs per person, balanced with impostor pairs (20% cross-person local, 80% local-vs-LFW).
+
+
 
 Renotte's code and video series [2] are the implementation starting point. This project changes/improves:
 
@@ -85,6 +97,7 @@ Suggested final conclusion structure:
 
 ### Limitations
 
+- **Session overfitting inflates the reported metrics.** Train and test images of a person come from the same capture sessions (for some people a single sitting), so "held-out" probes are near-duplicate frames sharing lighting, background, clothing, and camera position with training images. The model partly learns session similarity instead of identity, which explains near-perfect test scores while fresh live captures (new lighting, glasses, haircut) are rejected. Fix: capture additional, independent sessions per person and split by session.
 - The locally captured genuine set is small, while impostors come from LFW; camera, crop, and background differences may partly separate the two groups.
 - The matcher is specialized for the locally recorded identities. It is not evidence of a general face representation that can verify a completely unseen person without retraining.
 - Training, pair-test, and operational LFW impostors use disjoint LFW identity partitions. This prevents LFW identity reuse, but it does not remove the larger capture-source difference between local genuine images and LFW impostors.
@@ -208,3 +221,7 @@ Open <http://localhost:5173>.
 4. G. B. Huang and E. Learned-Miller, “Labeled Faces in the Wild: Updates and New Reporting Procedures,” UMass Amherst Technical Report UM-CS-2014-003, 2014. [Institution-hosted paper](https://people.cs.umass.edu/~elm/papers/lfw_update.pdf).
 5. A. K. Jain, A. A. Ross, K. Nandakumar, and T. Swearingen, *Introduction to Biometrics*, 2nd ed. Springer, 2024. [Publisher record and DOI](https://doi.org/10.1007/978-3-031-61675-4).
 6. A. Jha, “LFW People (Face Recognition),” Kaggle mirror used by `kagglehub`. [Download page](https://www.kaggle.com/datasets/atulanandjha/lfwpeople). Dataset provenance and protocol are cited from [3] and [4].
+
+### AI-assisted development
+
+AI coding assistants (Claude Code and OpenAI Codex) were used during development for prototyping, refactoring, boilerplate, and as research aids (e.g. narrowing down TensorFlow/Keras compatibility issues). All AI-suggested code was reviewed, tested, and adapted by me, and I take full responsibility for the final implementation.

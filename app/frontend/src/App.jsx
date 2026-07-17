@@ -15,8 +15,8 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [preview, setPreview] = useState(null); // image shown instead of the live cam
-  const [detThr, setDetThr] = useState(0.5); // per-image match cutoff
-  const [verThr, setVerThr] = useState(0.5); // fraction of gallery matches to accept
+  const [matchThreshold, setMatchThreshold] = useState(0.5);
+  const [decisionThreshold, setdecisionThreshold] = useState(0.5);
   const [camReady, setCamReady] = useState(false); // stream has frames to capture
   const [camError, setCamError] = useState(false); // webcam could not be acquired
 
@@ -68,18 +68,14 @@ export default function App() {
     setError(null);
   }
 
-  // Send a JPEG/image blob to the backend for the selected person.
-  async function sendToVerify(blob) {
+  // Run a verify request: handle loading, round-trip timing, result and errors.
+  // sendRequest returns the fetch promise; callers only build the request.
+  async function submit(sendRequest) {
     setLoading(true);
     reset();
     try {
-      const form = new FormData();
-      form.append("person", person);
-      form.append("file", blob, "input.jpg");
-      form.append("detection_threshold", detThr);
-      form.append("verification_threshold", verThr);
       const t0 = performance.now();
-      const res = await fetch(`${API}/verify`, { method: "POST", body: form });
+      const res = await sendRequest();
       const roundtrip_ms = performance.now() - t0;
       if (!res.ok) throw new Error();
       setResult({ ...(await res.json()), roundtrip_ms });
@@ -88,6 +84,16 @@ export default function App() {
     } finally {
       setLoading(false);
     }
+  }
+
+  // Send a JPEG/image blob to the backend for the selected person.
+  function sendToVerify(blob) {
+    const form = new FormData();
+    form.append("person", person);
+    form.append("file", blob, "input.jpg");
+    form.append("detection_threshold", matchThreshold);
+    form.append("verification_threshold", decisionThreshold);
+    return submit(() => fetch(`${API}/verify`, { method: "POST", body: form }));
   }
 
   function verifyCamera() {
@@ -114,30 +120,20 @@ export default function App() {
   }
 
   // Click a staged probe -> verify it server-side against the selected person.
-  async function verifyTest(name) {
+  function verifyTest(name) {
     setPreview(`${API}/test-images-static/${name}`);
-    setLoading(true);
-    reset();
-    try {
-      const t0 = performance.now();
-      const res = await fetch(`${API}/verify-test`, {
+    return submit(() =>
+      fetch(`${API}/verify-test`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           person,
           name,
-          detection_threshold: detThr,
-          verification_threshold: verThr,
+          detection_threshold: matchThreshold,
+          verification_threshold: decisionThreshold,
         }),
-      });
-      const roundtrip_ms = performance.now() - t0;
-      if (!res.ok) throw new Error();
-      setResult({ ...(await res.json()), roundtrip_ms });
-    } catch {
-      setError("Verification request failed. Is the backend running?");
-    } finally {
-      setLoading(false);
-    }
+      })
+    );
   }
 
   const disabled = loading || !person;
@@ -167,26 +163,26 @@ export default function App() {
 
       <div className="thresholds">
         <label>
-          <span>Match threshold (per image): {detThr.toFixed(2)}</span>
+          <span>Match threshold (per image): {matchThreshold.toFixed(2)}</span>
           <input
             type="range"
             min="0"
             max="1"
             step="0.01"
-            value={detThr}
-            onChange={(e) => setDetThr(parseFloat(e.target.value))}
+            value={matchThreshold}
+            onChange={(e) => setMatchThreshold(parseFloat(e.target.value))}
             disabled={loading}
           />
         </label>
         <label>
-          <span>Decision threshold (fraction of gallery): {verThr.toFixed(2)}</span>
+          <span>Decision threshold (fraction of gallery): {decisionThreshold.toFixed(2)}</span>
           <input
             type="range"
             min="0"
             max="1"
             step="0.01"
-            value={verThr}
-            onChange={(e) => setVerThr(parseFloat(e.target.value))}
+            value={decisionThreshold}
+            onChange={(e) => setdecisionThreshold(parseFloat(e.target.value))}
             disabled={loading}
           />
         </label>

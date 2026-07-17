@@ -63,11 +63,7 @@ def list_persons() -> list[str]:
     """Enrolled persons = subdirs of data/ with a non-empty verification/ folder."""
     if not os.path.isdir(DATA_DIR):
         return []
-    people = []
-    for name in sorted(os.listdir(DATA_DIR)):
-        if _jpgs(_gallery_dir(name)):
-            people.append(name)
-    return people
+    return [name for name in sorted(os.listdir(DATA_DIR)) if _jpgs(_gallery_dir(name))]
 
 
 def list_test_images() -> list[str]:

@@ -21,14 +21,14 @@ This project is split into two parts:
 
 Renotte's code and video series [2] are the implementation starting point. This project changes/improves:
 
-- **multi identitiy enrollment** is possible, cross-person impostor pairs are used for training;
-- **model evaluation** to catch issues like overfitting or poor perfomance early;
-- **extended biometric error evauluation**: genuine/impostor histograms, FMR, FNMR, DET, EER, d-prime, FAR, FRR, ROC-AUC, confusion counts, and inference latency;
+- **multi identity enrollment** is possible, cross-person impostor pairs are used for training;
+- **model evaluation** to catch issues like overfitting or poor performance early;
+- **extended biometric error evaluation**: genuine/impostor histograms, FMR, FNMR, DET, EER, d-prime, FAR, FRR, ROC-AUC, confusion counts, and inference latency;
 - LFW identities split before sampling so test impostors are not represented in the training-impostor pool;
 - deterministic sampling, versioned models, pinned dependencies, CPU-safe execution, and Git LFS model delivery;
 - compatibility updates for current TensorFlow/Keras, a corrected `2 x 2` first pooling window, and more responsive webcam capture.
 
-The notebook also explains changes beside the relevant code and dispalys outputs.
+The notebook also explains changes beside the relevant code and displays outputs.
 
 ## Background
 
@@ -177,11 +177,11 @@ The held-out test metrics remain close to the training metrics: accuracy decreas
 
 Figure 1 shows the main reason for the strong metrics: genuine comparison scores are concentrated close to 1, while both local and LFW impostor scores are concentrated close to 0. At the fixed comparison threshold of 0.5, 113 of 12,000 impostor comparisons are incorrectly matched and 3 of 1,500 genuine comparisons are incorrectly rejected. The large d-prime of 12.565 shows the strong separation between the distributions, but it should not be read as proof that their tails are harmless.
 
-The fixed threshold of 0.5 is lower than the approximate EER threshold of 0.652. Consequently, its FMR of 0.942% is higher than its FNMR of 0.200%: the chosen operating point favors accepting genuine users at the cost of more impostor matches. The EER of 0.804% is retained as a compact summary of the matcher trade-off; its threshold is not used by the application. Figures 2 shows that increasing the threshold would reduce FMR but increase FNMR.
+The fixed threshold of 0.5 is lower than the approximate EER threshold of 0.652. Consequently, its FMR of 0.942% is higher than its FNMR of 0.200%: the chosen operating point favors accepting genuine users at the cost of more impostor matches. The EER of 0.804% is retained as a compact summary of the matcher trade-off; its threshold is not used by the application. Figure 2 shows that increasing the threshold would reduce FMR but increase FNMR.
 
 At application level, each probe is compared with ten references and accepted when at least six comparisons match. This fusion removes the three observed genuine comparison errors: all 150 genuine transactions are accepted, giving an observed FRR of 0.000%. It also produces no false accepts among the 300 local-impostor transactions. The LFW set produces all observed transaction-level false accepts: 7 of 900 are accepted, resulting in a pooled FAR of 0.583% and an LFW-only FAR of 0.778%.
 
-The errors are not evenly distributed across claims. Six of the seven false accepts occur when an LFW face claims `justin`; the remaining one occurs for `lara`, and none occurs for `tomas`. Figure 4 shows perfect diagonal and zero-valued off-diagonal cells demonstrate correct decisions for the three locally captured identities.
+The errors are not evenly distributed across claims. Six of the seven false accepts occur when an LFW face claims `justin`; the remaining one occurs for `lara`, and none occurs for `tomas`. Figure 4 shows a perfect diagonal and zero-valued off-diagonal cells, demonstrating correct decisions for the three locally captured identities.
 
 A ten-reference model inference has a per-identity median between 16.64 and 17.65 ms; the highest measured p95 is 23.57 ms. This illustrates that model inference is responsive and usable. 
 
@@ -204,7 +204,7 @@ app/backend/                         inference API
 app/frontend/                        webapp for webcam interface
 data/<person>/verification/          committed reference galleries the app enrolls
 data/test_probes/                    staged probe images shown in the app
-evaluation/                          plots images 
+evaluation/                          plot images
 models/                              versioned model files via Git LFS
 notebooks/facial-verification.ipynb  training, evaluation, plots, interpretation
 requirements.txt                     pinned notebook dependencies
@@ -215,10 +215,10 @@ requirements.lock.txt                complete reproducible Python environment
 
 ## Reproduce the notebook
 
-The repo does not come with data of enrolled people, you can capture your own and retrain a new model or look at the exiting outputs from the notebook.
+The repo does not come with data of enrolled people, you can capture your own and retrain a new model or look at the existing outputs from the notebook.
 The data shipped is to support the verification app.
 
-> The notebook was only tested on a MacBooks (Silicon & Intel (CPU only))
+> The notebook was only tested on MacBooks (Apple Silicon, and Intel with CPU only)
 
 ### Prerequisites
 

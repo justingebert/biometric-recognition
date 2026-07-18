@@ -3,6 +3,11 @@ import os
 from time import perf_counter
 
 import numpy as np
+
+# TensorFlow emits a benign warning whenever a finite dataset is exhausted.
+# Configure its C++ logger before importing TensorFlow so it does not end up in
+# application or exported-notebook output.
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 import tensorflow as tf
 from tensorflow.keras.layers import Layer
 
@@ -33,9 +38,6 @@ MODEL_PATH = _latest_model(MODELS_DIR)
 print("Loaded Model: ", MODEL_PATH)
 
 class L1Dist(Layer):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     def call(self, input_embedding, validation_embedding):
         return tf.math.abs(input_embedding - validation_embedding)
 

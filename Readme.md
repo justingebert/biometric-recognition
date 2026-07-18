@@ -135,16 +135,16 @@ The evaluation is done on two levels:
 | Level | Result | Final value |
 |---|---|---:|
 | Comparison | Genuine / impostor comparison scores | 1,500 / 12,000 (3,000 local + 9,000 LFW) |
-| Comparison | EER at approximate threshold | **0.804%** at **0.652** |
-| Comparison | d-prime | **12.565** |
-| Comparison | FMR at `MATCH_THR=0.5` | **0.942% (113/12,000)** |
-| Comparison | FNMR at `MATCH_THR=0.5` | **0.200% (3/1,500)** |
-| Application | Pooled FAR | **0.583% (7/1,200)** |
-| Application | Local-impostor FAR | 0.000% (0/300) |
-| Application | LFW-impostor FAR | 0.778% (7/900) |
+| Comparison | EER at approximate threshold | **1.054%** at **0.794** |
+| Comparison | d-prime | **11.038** |
+| Comparison | FMR at `MATCH_THR=0.5` | **1.650% (198/12,000)** |
+| Comparison | FNMR at `MATCH_THR=0.5` | **0.000% (0/1,500)** |
+| Application | Pooled FAR | **0.917% (11/1,200)** |
+| Application | Local-impostor FAR | 0.333% (1/300) |
+| Application | LFW-impostor FAR | 1.111% (10/900) |
 | Application | Pooled FRR | **0.000% (0/150)** |
-| Performance | Model-only 10-reference inference, per-identity median / p95 range | **16.64–17.65 / 17.60–23.57 ms** |
-| Performance | Model-only 1:1 comparison, median / p95 | 5.80 / 6.21 ms |
+| Performance | Model-only 10-reference inference, per-identity median / p95 range | **16.42–16.51 / 17.11–17.43 ms** |
+| Performance | Model-only 1:1 comparison, median / p95 | 5.92 / 7.01 ms |
 
 The timing benchmark covers model inference after image preprocessing. It is not end-to-end webcam or API latency; report the device and the number of reference comparisons with it.
 
@@ -154,8 +154,8 @@ This table is important for the multi-subject evaluation: pooled rates alone can
 
 | Claimed identity | Genuine transactions | Local / LFW impostor transactions | FRR | Local FAR | LFW FAR | Combined FAR |
 |---|---:|---:|---:|---:|---:|---:|
-| `justin` | 50 | 100 / 300 | 0.000% (0/50) | 0.000% (0/100) | 2.000% (6/300) | 1.500% (6/400) |
-| `lara` | 50 | 100 / 300 | 0.000% (0/50) | 0.000% (0/100) | 0.333% (1/300) | 0.250% (1/400) |
+| `justin` | 50 | 100 / 300 | 0.000% (0/50) | 0.000% (0/100) | 3.333% (10/300) | 2.500% (10/400) |
+| `lara` | 50 | 100 / 300 | 0.000% (0/50) | 1.000% (1/100) | 0.000% (0/300) | 0.250% (1/400) |
 | `tomas` | 50 | 100 / 300 | 0.000% (0/50) | 0.000% (0/100) | 0.000% (0/300) | 0.000% (0/400) |
 
 ### Plots
@@ -166,26 +166,26 @@ This table is important for the multi-subject evaluation: pooled rates alone can
 | ![Histogram of genuine and impostor comparison scores](evaluation/histogram.png) | ![FMR and FNMR plotted against the comparison threshold](evaluation/fmr-fnmr-vs-thr.png) |
 | **Figure 1.** Genuine and impostor comparison-score distributions. | **Figure 2.** FMR and FNMR across comparison thresholds, including their approximate EER intersection. |
 
-| DET curve | Per-identity acceptance matrix                                                                          |
-|---|---------------------------------------------------------------------------------------------------------|
+| DET curve                                                                   | Per-identity acceptance matrix                                                                          |
+|-----------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
 | ![DET curve showing the trade-off between FMR and FNMR](evaluation/det.png) | ![Matrix of local acceptance rates by claimed identity and probe identity](evaluation/personmatrix.png) |
-| **Figure 3.** Detection error trade-off across thresholds. | **Figure 4.** Application acceptance rate for every claimed identity combination.                       |
+| **Figure 3.** Detection error trade-off across thresholds (linear).         | **Figure 4.** Application acceptance rate for every claimed identity combination.                       |
 
 ### Interpretation
 
 The held-out test metrics remain close to the training metrics: accuracy decreases from 0.996 to 0.995, while precision, recall, and F1 are also within 0.002.
 
-Figure 1 shows the main reason for the strong metrics: genuine comparison scores are concentrated close to 1, while both local and LFW impostor scores are concentrated close to 0. At the fixed comparison threshold of 0.5, 113 of 12,000 impostor comparisons are incorrectly matched and 3 of 1,500 genuine comparisons are incorrectly rejected. The large d-prime of 12.565 shows the strong separation between the distributions, but it should not be read as proof that their tails are harmless.
+Figure 1 shows the main reason for the strong metrics: genuine comparison scores are concentrated close to 1, while both local and LFW impostor scores are concentrated close to 0. At the fixed comparison threshold of 0.5, 198 of 12,000 impostor comparisons are incorrectly matched, while none of the 1,500 genuine comparisons are incorrectly rejected. The large d-prime of 11.038 shows the strong separation between the distributions, but it should not be read as proof that their tails are harmless.
 
-The fixed threshold of 0.5 is lower than the approximate EER threshold of 0.652. Consequently, its FMR of 0.942% is higher than its FNMR of 0.200%: the chosen operating point favors accepting genuine users at the cost of more impostor matches. The EER of 0.804% is retained as a compact summary of the matcher trade-off; its threshold is not used by the application. Figure 2 shows that increasing the threshold would reduce FMR but increase FNMR.
+The fixed threshold of 0.5 is lower than the approximate EER threshold of 0.794. Consequently, its FMR of 1.650% is higher than its FNMR of 0.000%: the chosen operating point favors accepting genuine users at the cost of more impostor matches. The EER of 1.054% is retained as a compact summary of the matcher trade-off; its threshold is not used by the application. Figure 2 shows that increasing the threshold would reduce FMR but increase FNMR.
 
-At application level, each probe is compared with ten references and accepted when at least six comparisons match. This fusion removes the three observed genuine comparison errors: all 150 genuine transactions are accepted, giving an observed FRR of 0.000%. It also produces no false accepts among the 300 local-impostor transactions. The LFW set produces all observed transaction-level false accepts: 7 of 900 are accepted, resulting in a pooled FAR of 0.583% and an LFW-only FAR of 0.778%.
+At application level, each probe is compared with ten references and accepted when at least six comparisons match. All 150 genuine transactions are accepted, giving an observed FRR of 0.000%. One of the 300 local-impostor transactions and 10 of the 900 LFW-impostor transactions are falsely accepted, resulting in a pooled FAR of 0.917%, a local-impostor FAR of 0.333%, and an LFW-only FAR of 1.111%.
 
-The errors are not evenly distributed across claims. Six of the seven false accepts occur when an LFW face claims `justin`; the remaining one occurs for `lara`, and none occurs for `tomas`. Figure 4 shows a perfect diagonal and zero-valued off-diagonal cells, demonstrating correct decisions for the three locally captured identities.
+The errors are not evenly distributed across claims. Ten of the eleven false accepts occur when an LFW face claims `justin`; the remaining false accept occurs when a local `justin` probe claims `lara`, and none occurs for `tomas`. Figure 4 shows a perfect diagonal and one non-zero off-diagonal cell: 2.0% of local `justin` probes are accepted when claiming `lara`.
 
-A ten-reference model inference has a per-identity median between 16.64 and 17.65 ms; the highest measured p95 is 23.57 ms. This illustrates that model inference is responsive and usable. 
+A ten-reference model inference has a per-identity median between 16.42 and 16.51 ms; the highest measured p95 is 17.43 ms. This illustrates that model inference is responsive and usable.
 
-Overall, the final model performs well as a three-person demonstration under the conditions: it has strong score separation, no observed genuine transaction rejection, and no observed local cross-person false acceptance.
+Overall, the final model performs well as a three-person demonstration under the conditions: it has strong score separation, no observed genuine transaction rejection, and one observed local cross-person false acceptance.
 
 ### Limitations
 

@@ -18,7 +18,7 @@ TEST_PROBES_DIR = os.path.join(DATA_DIR, "test_probes")
 
 # Max gallery images used per verify (first N by sorted filename -> deterministic).
 # Set to None to use every image in the person's verification/ folder.
-GALLERY_LIMIT = 50
+GALLERY_LIMIT = 10
 
 DETECTION_THRESHOLD = 0.5
 VERIFICATION_THRESHOLD = 0.5

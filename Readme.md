@@ -81,10 +81,10 @@ Impostor source: **LFW**, 13,233 images of 5,749 identities, split by identity i
 Genuine identity recordings:
 
 | Person | Capture sessions |
-|---|-:|
-| justin | 7 |
-| lara | 1 |
-| tomas | 1 |
+|---|-----------------:|
+| justin |                7 |
+| lara |                2 |
+| tomas |                1 |
 
 Data split:
 
@@ -92,6 +92,8 @@ Data split:
 |-------|---:|---:|---:|---:|
 | Train | 3,000 (1,000/person, anchor×positive) | 1,500 | 1,500 | 6,000 |
 | Test  | 900 (300/person, verification×anchor) | 450 | 450 | 1,800 |
+
+> **Data consent and handling.** All locally recorded people consented to their face images being used for training and evaluation in this project. Treat the committed images as personal data: use them only for this coursework, do not redistribute them, and delete them once the assessment is completed.
 
 ### Basic Model evaluation
 
@@ -175,9 +177,9 @@ This table is important for the multi-subject evaluation: pooled rates alone can
 
 The held-out test metrics remain close to the training metrics: accuracy decreases from 0.996 to 0.995, while precision, recall, and F1 are also within 0.002.
 
-Figure 1 shows the main reason for the strong metrics: genuine comparison scores are concentrated close to 1, while both local and LFW impostor scores are concentrated close to 0. At the fixed comparison threshold of 0.5, 198 of 12,000 impostor comparisons are incorrectly matched, while none of the 1,500 genuine comparisons are incorrectly rejected. The large d-prime of 11.038 shows the strong separation between the distributions, but it should not be read as proof that their tails are harmless.
+Figure 1 shows the main reason for the strong metrics: genuine comparison scores are concentrated close to 1, while both local and LFW impostor scores are concentrated close to 0. At the fixed comparison threshold of 0.5, 198 of 12,000 impostor comparisons are incorrectly matched, while none of the 1,500 genuine comparisons are incorrectly rejected. The large d-prime of 11.038 shows the strong separation between the distributions.
 
-The fixed threshold of 0.5 is lower than the approximate EER threshold of 0.794. Consequently, its FMR of 1.650% is higher than its FNMR of 0.000%: the chosen operating point favors accepting genuine users at the cost of more impostor matches. The EER of 1.054% is retained as a compact summary of the matcher trade-off; its threshold is not used by the application. Figure 2 shows that increasing the threshold would reduce FMR but increase FNMR.
+The fixed threshold of 0.5 is lower than the approximate EER threshold of 0.794. Consequently, its FMR of 1.650% is higher than its FNMR of 0.000%: the chosen operating point favors accepting genuine users at the cost of more impostor matches. Figure 2 shows that increasing the threshold would reduce FMR but increase FNMR.
 
 At application level, each probe is compared with ten references and accepted when at least six comparisons match. All 150 genuine transactions are accepted, giving an observed FRR of 0.000%. One of the 300 local-impostor transactions and 10 of the 900 LFW-impostor transactions are falsely accepted, resulting in a pooled FAR of 0.917%, a local-impostor FAR of 0.333%, and an LFW-only FAR of 1.111%.
 
@@ -215,8 +217,7 @@ requirements.lock.txt                complete reproducible Python environment
 
 ## Reproduce the notebook
 
-The repo does not come with data of enrolled people, you can capture your own and retrain a new model or look at the existing outputs from the notebook.
-The data shipped is to support the verification app.
+The repo does not come with training data of enrolled people; the shipped `data/` folders only support the verification app. Running the notebook end to end therefore requires [enrolling yourself with the capture cell and training a new model](#enroll-and-train-a-new-model). Without that, the data-construction cell stops early. Without a webcam, you can still read the committed notebook outputs and the results above.
 
 > The notebook was only tested on MacBooks (Apple Silicon, and Intel with CPU only)
 
@@ -236,6 +237,13 @@ cd biometrics
 git lfs pull #!important! if you want to use the pretrained model
 ```
 
+```bash 
+# setup python 3.11.15 with pyenv (macOS)
+brew install pyenv
+pyenv install 3.11.15
+pyenv local 3.11.15
+```
+
 ```bash
 # Python environment setup
 python -m venv .venv
@@ -243,7 +251,8 @@ source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -r requirements.lock.txt
 python -m ipykernel install --user --name biometrics --display-name "Python (biometrics)"
-jupyter lab notebooks/facial-verification.ipynb
+
+#open notebook in vscode or jupyter lab 
 ```
 
 CPU is the reproducible default. GPU support is opt-in:
@@ -263,9 +272,11 @@ Restart the kernel after changing device configuration. If Metal fails, restart 
 2. Capture `anchor (a)` , `positive (p)`, and `verification (v)`
 3. set `CAPTURE = False` and `TRAIN = True` and run the notebook from top to bottom
 
+Instead of capturing, existing `.jpg` face images can be copied into `data/<person>/anchor/`, `data/<person>/positive/`, and `data/<person>/verification/`; a person is used once all three folders contain images.
+
 ---
 
-## Run the verification/inference webapp
+## Run the verification app
 
 The app performs 1:1 verification: pick a **claimed identity**, then present a probe (webcam capture, an uploaded image, or a staged test probe). 
 
@@ -277,11 +288,11 @@ The app reads enrolled people directly from `data/`:
 
 ```text
 data/<person>/verification/*.jpg   reference gallery for each enrolled person
-data/manual_test/*.jpg             staged probe images, shown as clickable thumbnails
+data/test_probes/*.jpg             staged probe images, shown as clickable thumbnails
 ```
 
 - A person is selectable when `data/<person>/verification/` holds at least one `.jpg`; the dropdown lists these people. To enroll someone, drop their reference images into that folder.
-- `data/manual_test/` holds probe images rendered as a thumbnail grid; click one to verify it against the selected identity.
+- `data/test_probes/` holds probe images rendered as a thumbnail grid; click one to verify it against the selected identity.
 
 
 ### Run the webapp:

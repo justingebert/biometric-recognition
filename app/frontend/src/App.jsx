@@ -3,6 +3,13 @@ import "./App.css";
 
 const API = "http://localhost:8000";
 
+// Time an async request; resolves to [response, elapsed ms].
+async function timed(sendRequest) {
+  const t0 = performance.now();
+  const res = await sendRequest();
+  return [res, performance.now() - t0];
+}
+
 export default function App() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -42,10 +49,7 @@ export default function App() {
 
   // Re-attach the stream whenever we return to the live camera view.
   useEffect(() => {
-    if (!preview) {
-      setCamReady(false);
-      attachStream();
-    }
+    if (!preview) attachStream();
   }, [preview]);
 
   // Load enrolled persons and staged test probes.
@@ -74,9 +78,7 @@ export default function App() {
     setLoading(true);
     reset();
     try {
-      const t0 = performance.now();
-      const res = await sendRequest();
-      const roundtrip_ms = performance.now() - t0;
+      const [res, roundtrip_ms] = await timed(sendRequest);
       if (!res.ok) throw new Error();
       setResult({ ...(await res.json()), roundtrip_ms });
     } catch {
@@ -228,6 +230,7 @@ export default function App() {
           <button
             className="ghost"
             onClick={() => {
+              setCamReady(false);
               setPreview(null);
               reset();
             }}
